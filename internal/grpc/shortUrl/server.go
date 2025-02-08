@@ -2,11 +2,10 @@ package shorturl
 
 import (
 	"context"
-	"net/url"
 
 	shortUrl "github.com/dennnniska/shortUrl/internal/grpc/shortUrl/protofile"
+	"github.com/dennnniska/shortUrl/internal/lib/service"
 	"google.golang.org/grpc"
-	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
@@ -14,33 +13,29 @@ const lenSortURL = 10
 
 type serverAPI struct {
 	shortUrl.UnimplementedShortUrlServer
+	service service.ServiceShortUrl
 }
 
-func RegisterGRPCServer(gRPC *grpc.Server) {
-	shortUrl.RegisterShortUrlServer(gRPC, &serverAPI{})
+func RegisterGRPCServer(gRPC *grpc.Server, service service.ServiceShortUrl) {
+	shortUrl.RegisterShortUrlServer(gRPC, &serverAPI{service: service})
 }
 
 func (s *serverAPI) GET(ctx context.Context, req *shortUrl.GetRequest) (*shortUrl.GetResponse, error) {
-	if req.GetShortUrl() == "" {
-		return nil, status.Error(codes.InvalidArgument, "shortUrl is required")
-	}
-
-	if len(req.GetShortUrl()) != lenSortURL {
-		return nil, status.Error(codes.InvalidArgument, "length of shortUrl is not equal to 10")
+	URL, code, err := s.service.Get(req.GetShortUrl())
+	if err != nil {
+		return nil, status.Error(code, err.Error())
 	}
 	return &shortUrl.GetResponse{
-		Url: req.GetShortUrl(),
+		Url: URL,
 	}, nil
 }
 func (s *serverAPI) Post(ctx context.Context, req *shortUrl.PostRequest) (*shortUrl.PostResponse, error) {
-	if req.GetUrl() == "" {
-		return nil, status.Error(codes.InvalidArgument, "URL is required")
-	}
-	if _, err := url.ParseRequestURI(req.GetUrl()); err != nil {
-		return nil, status.Error(codes.InvalidArgument, "URL is required")
+	shortURL, code, err := s.service.Post(req.GetUrl())
+	if err != nil {
+		return nil, status.Error(code, err.Error())
 	}
 
 	return &shortUrl.PostResponse{
-		ShortUrl: req.GetUrl(),
+		ShortUrl: shortURL,
 	}, nil
 }

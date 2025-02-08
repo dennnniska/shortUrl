@@ -1,5 +1,5 @@
 env: "local"
-in_memory_storage: false
+in_memory_storage: true
 grpc:
   port: 44044
   timeout: 5s

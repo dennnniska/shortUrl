@@ -6,6 +6,7 @@ import (
 	"net"
 
 	shortUrlGRPC "github.com/dennnniska/shortUrl/internal/grpc/shortUrl"
+	"github.com/dennnniska/shortUrl/internal/lib/service"
 	"google.golang.org/grpc"
 )
 
@@ -15,10 +16,10 @@ type App struct {
 	port       int
 }
 
-func New(log *slog.Logger, port int) *App {
+func New(log *slog.Logger, port int, service service.ServiceShortUrl) *App {
 	gRPCServer := grpc.NewServer()
 
-	shortUrlGRPC.RegisterGRPCServer(gRPCServer)
+	shortUrlGRPC.RegisterGRPCServer(gRPCServer, service)
 
 	return &App{
 		log:        log,

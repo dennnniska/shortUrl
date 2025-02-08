@@ -6,6 +6,7 @@ import (
 	"log/slog"
 	"net/http"
 
+	"github.com/dennnniska/shortUrl/internal/lib/service"
 	"github.com/go-chi/chi/v5/middleware"
 	render "github.com/go-chi/render"
 	"github.com/go-playground/validator/v10"
@@ -21,7 +22,7 @@ type Response struct {
 	URL    string `json:"URL"`
 }
 
-func New(log *slog.Logger) http.HandlerFunc {
+func New(log *slog.Logger, service service.ServiceShortUrl) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		const op = "handler.URL.get.New"
 		log = log.With(
@@ -70,10 +71,16 @@ func New(log *slog.Logger) http.HandlerFunc {
 
 			return
 		}
-
+		URL, _, err := service.Get(req.ShortURL)
+		if err != nil {
+			render.JSON(w, r, Response{
+				Status: "Error",
+				Error:  err.Error(),
+			})
+		}
 		render.JSON(w, r, Response{
 			Status: "OK",
-			URL:    req.ShortURL,
+			URL:    URL,
 		})
 	}
 }

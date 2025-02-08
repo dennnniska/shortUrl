@@ -6,8 +6,9 @@ import (
 	"net/http"
 	"time"
 
-	get "github.com/dennnniska/shortUrl/internal/http/handler/shoerUrl/get"
+	"github.com/dennnniska/shortUrl/internal/http/handler/shoerUrl/get"
 	"github.com/dennnniska/shortUrl/internal/http/handler/shoerUrl/post"
+	"github.com/dennnniska/shortUrl/internal/lib/service"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 )
@@ -18,14 +19,14 @@ type App struct {
 	address    string
 }
 
-func New(log *slog.Logger, address string, timeout, idleTimeout time.Duration) *App {
+func New(log *slog.Logger, address string, timeout, idleTimeout time.Duration, service service.ServiceShortUrl) *App {
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
-	router.Post("/post", post.New(log))
-	router.Get("/get", get.New(log))
+	router.Post("/post", post.New(log, service))
+	router.Get("/get", get.New(log, service))
 
 	HTTPServer := &http.Server{
 		Addr:         address,

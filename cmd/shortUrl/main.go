@@ -8,6 +8,8 @@ import (
 
 	"github.com/dennnniska/shortUrl/internal/app"
 	"github.com/dennnniska/shortUrl/internal/config"
+	"github.com/dennnniska/shortUrl/internal/storage"
+	inmemory "github.com/dennnniska/shortUrl/internal/storage/in-memory"
 )
 
 const (
@@ -23,7 +25,7 @@ func main() {
 
 	log.Info("starting", slog.String("env", cfg.Env))
 
-	application := app.New(log, cfg.GRPC.Port, cfg.Http.Address, cfg.GRPC.Timeout, cfg.Http.IdleTimeout)
+	application := app.New(log, cfg)
 
 	go application.HTTPSrv.MustRun()
 
@@ -66,4 +68,8 @@ func setupLogger(env string) *slog.Logger {
 	}
 
 	return log
+}
+
+func NewStorage(inMemory bool) (storage.Storage, error) {
+	return inmemory.New(), nil
 }

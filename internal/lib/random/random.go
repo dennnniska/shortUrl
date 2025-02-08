@@ -14,7 +14,7 @@ const (
 func RandStringBytesMaskImpr(n int) string {
 	b := make([]byte, n)
 	capital, lowercase, underlining := false, false, false
-	for !capital && !lowercase && !underlining {
+	for !capital || !lowercase || !underlining {
 		capital, lowercase, underlining = false, false, false
 		for i, cache, remain := n-1, rand.Int64(), letterIdxMax; i >= 0; {
 			if remain == 0 {
