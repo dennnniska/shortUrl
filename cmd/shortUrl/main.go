@@ -3,7 +3,10 @@ package main
 import (
 	"log/slog"
 	"os"
+	"os/signal"
+	"syscall"
 
+	"github.com/dennnniska/shortUrl/internal/app"
 	"github.com/dennnniska/shortUrl/internal/config"
 )
 
@@ -19,6 +22,29 @@ func main() {
 	log := setupLogger(cfg.Env)
 
 	log.Info("starting", slog.String("env", cfg.Env))
+
+	application := app.New(log, cfg.GRPC.Port, cfg.Http.Address, cfg.GRPC.Timeout, cfg.Http.IdleTimeout)
+
+	go application.HTTPSrv.MustRun()
+
+	go application.GRPCSrv.MustRun()
+
+	stop := make(chan os.Signal, 1)
+	signal.Notify(stop, syscall.SIGTERM, syscall.SIGINT)
+
+	sign := <-stop
+
+	log.Info("stopping application GRPC", slog.String("signal", sign.String()))
+
+	application.GRPCSrv.Stop()
+
+	log.Info("application stopped GRPC")
+
+	log.Info("stopping server HTTP", slog.String("signal", sign.String()))
+
+	application.HTTPSrv.Stop()
+
+	log.Info("server stopped HTTP")
 }
 
 func setupLogger(env string) *slog.Logger {

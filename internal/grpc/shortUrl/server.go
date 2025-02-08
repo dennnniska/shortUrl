@@ -15,9 +15,11 @@ func RegisterGRPCServer(gRPC *grpc.Server) {
 	shortUrl.RegisterShortUrlServer(gRPC, &serverAPI{})
 }
 
-func (s *serverAPI) GET(context.Context, *shortUrl.GetRequest) (*shortUrl.GetResponse, error) {
-	panic("implement me")
+func (s *serverAPI) GET(ctx context.Context, req *shortUrl.GetRequest) (*shortUrl.GetResponse, error) {
+	return &shortUrl.GetResponse{
+		Url: req.GetShortUrl(),
+	}, nil
 }
-func (s *serverAPI) Post(context.Context, *shortUrl.PostRequest) (*shortUrl.PostResponse, error) {
+func (s *serverAPI) Post(ctx context.Context, req *shortUrl.PostRequest) (*shortUrl.PostResponse, error) {
 	panic("implement me")
 }
