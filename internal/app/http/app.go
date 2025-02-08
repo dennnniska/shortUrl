@@ -6,7 +6,7 @@ import (
 	"net/http"
 	"time"
 
-	get "github.com/dennnniska/shortUrl/internal/http/handler/shoerUrl/Get"
+	get "github.com/dennnniska/shortUrl/internal/http/handler/shoerUrl/get"
 	"github.com/dennnniska/shortUrl/internal/http/handler/shoerUrl/post"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
