@@ -20,7 +20,8 @@ type App struct {
 func New(log *slog.Logger, cfg *config.Config) *App {
 	storage, err := NewStorage(cfg.InMemoryStorage, &cfg.Postgres)
 	if err != nil {
-		log.Error("failed to start storage")
+		log.Error("failed to start storage", err.Error())
+		return nil
 	}
 
 	var service service.ShortUrl

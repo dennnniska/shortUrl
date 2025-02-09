@@ -73,6 +73,10 @@ func New(log *slog.Logger, service service.ServiceShortUrl) http.HandlerFunc {
 		}
 		URL, _, err := service.Get(req.ShortURL)
 		if err != nil {
+			log.Error("storage error", slog.Attr{
+				Key:   "error",
+				Value: slog.StringValue(err.Error()),
+			})
 			render.JSON(w, r, Response{
 				Status: "Error",
 				Error:  err.Error(),

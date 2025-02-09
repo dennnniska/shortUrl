@@ -14,9 +14,10 @@ type Storage struct {
 	db *sqlx.DB
 }
 
+//docker run --name=todo-db -e POSTGRES_PASSWORD='qwerty' -p 5436:5432 -d --rm postgres
+
 func New(cfg *config.Postgres) (storage.Storage, error) {
 	db, err := sqlx.Open("postgres", fmt.Sprintf("host=%s port=%s user=%s dbname=%s password=%s sslmode=%s", cfg.Host, cfg.Port, cfg.Username, cfg.Dbname, os.Getenv("DB_PASSWORD"), cfg.Sslmode))
-	fmt.Println(err)
 	if err != nil {
 		return nil, err
 	}
@@ -27,9 +28,9 @@ func New(cfg *config.Postgres) (storage.Storage, error) {
 
 	stmt, err := db.Prepare(`
 	CREATE TABLE IF NOT EXISTS shortUrl(
-		id INTEGER PRIMARY KEY,
-		url TEXT NOT NULL UNIQ
-		shortUrl TEXT NOT NULL UNIQ
+		id SERIAL PRIMARY KEY,
+		url TEXT NOT NULL UNIQUE,
+		shortUrl TEXT NOT NULL UNIQUE
 	)
 	`)
 	if err != nil {
@@ -39,18 +40,17 @@ func New(cfg *config.Postgres) (storage.Storage, error) {
 	if err != nil {
 		return nil, err
 	}
+
 	return &Storage{
 		db: db,
 	}, nil
 }
 
 func (s *Storage) FoundUrl(shortUrl string) (string, bool, error) {
-	fmt.Print("fsafasf")
-	stmt, err := s.db.Prepare("SELECT url FROM url WHERE shortUrl = ?")
+	stmt, err := s.db.Prepare("SELECT url FROM shortUrl WHERE shortUrl = $1")
 	if err != nil {
 		return "", false, err
 	}
-	fmt.Print("fsafasf")
 	var resURL string
 
 	err = stmt.QueryRow(shortUrl).Scan(&resURL)
@@ -64,7 +64,7 @@ func (s *Storage) FoundUrl(shortUrl string) (string, bool, error) {
 }
 
 func (s *Storage) FoundShortUrl(url string) (string, bool, error) {
-	stmt, err := s.db.Prepare("SELECT shortUrl FROM url WHERE url = ?")
+	stmt, err := s.db.Prepare("SELECT shortUrl FROM shortUrl WHERE url = $1")
 	if err != nil {
 		return "", false, err
 	}
@@ -82,7 +82,7 @@ func (s *Storage) FoundShortUrl(url string) (string, bool, error) {
 }
 
 func (s *Storage) SaveUrl(url, shortUrl string) error {
-	stmt, err := s.db.Prepare("INSERT INTO shortUrl(url, shortUrl) VALUES(?, ?)")
+	stmt, err := s.db.Prepare("INSERT INTO shortUrl(url,shortUrl) VALUES($1, $2)")
 	if err != nil {
 		return err
 	}

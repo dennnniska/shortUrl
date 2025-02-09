@@ -32,6 +32,10 @@ func (s *ShortUrl) Post(URL string) (string, codes.Code, error) {
 		return "", codes.InvalidArgument, fmt.Errorf("invalid URL")
 	}
 
+	if s, ok, _ := s.storage.FoundShortUrl(URL); ok {
+		return s, codes.OK, nil
+	}
+
 	shortURLExist := true
 	var shortURL string
 

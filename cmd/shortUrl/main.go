@@ -27,6 +27,11 @@ func main() {
 
 	application := app.New(log, cfg)
 
+	if application == nil {
+		log.Error("failed to start storage")
+		return
+	}
+
 	go application.HTTPSrv.MustRun()
 
 	go application.GRPCSrv.MustRun()

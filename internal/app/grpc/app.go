@@ -19,7 +19,7 @@ type App struct {
 func New(log *slog.Logger, port int, service service.ServiceShortUrl) *App {
 	gRPCServer := grpc.NewServer()
 
-	shortUrlGRPC.RegisterGRPCServer(gRPCServer, service)
+	shortUrlGRPC.RegisterGRPCServer(gRPCServer, service, log)
 
 	return &App{
 		log:        log,
