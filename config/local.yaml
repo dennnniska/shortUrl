@@ -1,5 +1,5 @@
 env: "local"
-in_memory_storage: true
+in_memory_storage: false
 grpc:
   port: 44044
   timeout: 5s
@@ -7,3 +7,9 @@ http:
   address: "localhost:8082"
   timeout: 4s
   idle_timeout: 30s
+postgres:
+  host: "localhost"
+  port: "5426"
+  username: "postgres"
+  dbname: "postgres"
+  sslmode: "disable"

@@ -18,26 +18,25 @@ type App struct {
 }
 
 func New(log *slog.Logger, cfg *config.Config) *App {
-	storage, err := NewStorage(cfg.InMemoryStorage)
+	storage, err := NewStorage(cfg.InMemoryStorage, &cfg.Postgres)
 	if err != nil {
 		log.Error("failed to start storage")
 	}
 
-	service := &service.ShortUrl{
-		Storage: storage,
-	}
+	var service service.ShortUrl
+	service.AddStorage(storage)
 
-	grpcApp := grpcApp.New(log, cfg.GRPC.Port, service)
-	httpApp := httpApp.New(log, cfg.Http.Address, cfg.Http.Timeout, cfg.Http.IdleTimeout, service)
+	grpcApp := grpcApp.New(log, cfg.GRPC.Port, &service)
+	httpApp := httpApp.New(log, cfg.Http.Address, cfg.Http.Timeout, cfg.Http.IdleTimeout, &service)
 	return &App{
 		GRPCSrv: grpcApp,
 		HTTPSrv: httpApp,
 	}
 }
 
-func NewStorage(inMemory bool) (storage.Storage, error) {
+func NewStorage(inMemory bool, cfg *config.Postgres) (storage.Storage, error) {
 	if inMemory {
 		return inmemory.New(), nil
 	}
-	return postgres.New()
+	return postgres.New(cfg)
 }

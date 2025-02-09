@@ -17,7 +17,11 @@ type ServiceShortUrl interface {
 }
 
 type ShortUrl struct {
-	Storage storage.Storage
+	storage storage.Storage
+}
+
+func (s *ShortUrl) AddStorage(storage storage.Storage) {
+	s.storage = storage
 }
 
 func (s *ShortUrl) Post(URL string) (string, codes.Code, error) {
@@ -33,9 +37,12 @@ func (s *ShortUrl) Post(URL string) (string, codes.Code, error) {
 
 	for shortURLExist {
 		shortURL = random.RandStringBytesMaskImpr(lenSortURL)
-		_, shortURLExist = s.Storage.FoundUrl(shortURL)
+		_, shortURLExist, _ = s.storage.FoundUrl(shortURL)
 	}
-	s.Storage.SaveUrl(URL, shortURL)
+	err := s.storage.SaveUrl(URL, shortURL)
+	if err != nil {
+		return "", codes.Aborted, err
+	}
 	return shortURL, codes.OK, nil
 }
 
@@ -47,7 +54,10 @@ func (s *ShortUrl) Get(shortURL string) (string, codes.Code, error) {
 	if len(shortURL) != lenSortURL {
 		return "", codes.InvalidArgument, fmt.Errorf("length of shortUrl is not equal to 10")
 	}
-	URL, ok := s.Storage.FoundUrl(shortURL)
+	URL, ok, err := s.storage.FoundUrl(shortURL)
+	if err != nil {
+		return "", codes.Aborted, err
+	}
 	if !ok {
 		return "", codes.NotFound, fmt.Errorf("not found URL")
 	}

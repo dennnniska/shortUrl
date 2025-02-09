@@ -16,17 +16,18 @@ func New() storage.Storage {
 	}
 }
 
-func (s *Storage) FoundUrl(shortUrl string) (string, bool) {
+func (s *Storage) FoundUrl(shortUrl string) (string, bool, error) {
 	url, ok := s.shortUrls[shortUrl]
-	return url, ok
+	return url, ok, nil
 }
 
-func (s *Storage) FoundShortUrl(url string) (string, bool) {
+func (s *Storage) FoundShortUrl(url string) (string, bool, error) {
 	shortURL, ok := s.urls[url]
-	return shortURL, ok
+	return shortURL, ok, nil
 }
 
-func (s *Storage) SaveUrl(url, shortUrl string) {
+func (s *Storage) SaveUrl(url, shortUrl string) error {
 	s.urls[url] = shortUrl
 	s.shortUrls[shortUrl] = url
+	return nil
 }
