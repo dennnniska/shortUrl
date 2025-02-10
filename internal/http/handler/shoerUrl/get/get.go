@@ -81,6 +81,7 @@ func New(log *slog.Logger, service service.ServiceShortUrl) http.HandlerFunc {
 				Status: "Error",
 				Error:  err.Error(),
 			})
+			return 
 		}
 		render.JSON(w, r, Response{
 			Status: "OK",

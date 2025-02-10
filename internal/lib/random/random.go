@@ -4,7 +4,7 @@ import (
 	"math/rand/v2"
 )
 
-const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ_"
+const letterBytes = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_"
 const (
 	letterIdxBits = 6                    // 6 bits to represent a letter index
 	letterIdxMask = 1<<letterIdxBits - 1 // All 1-bits, as many as letterIdxBits
@@ -13,9 +13,9 @@ const (
 
 func RandStringBytesMaskImpr(n int) string {
 	b := make([]byte, n)
-	capital, lowercase, underlining := false, false, false
-	for !capital || !lowercase || !underlining {
-		capital, lowercase, underlining = false, false, false
+	capital, lowercase, underlining, numb := false, false, false, false
+	for !capital || !lowercase || !underlining || !numb {
+		capital, lowercase, underlining, numb = false, false, false, false
 		for i, cache, remain := n-1, rand.Int64(), letterIdxMax; i >= 0; {
 			if remain == 0 {
 				cache, remain = rand.Int64(), letterIdxMax
@@ -30,6 +30,9 @@ func RandStringBytesMaskImpr(n int) string {
 		for i := 0; i < len(b); i++ {
 			if b[i] >= 'a' && b[i] <= 'z' {
 				lowercase = true
+			}
+			if b[i] >= '0' && b[i] <= '9' {
+				numb = true
 			}
 			if b[i] >= 'A' && b[i] <= 'Z' {
 				capital = true

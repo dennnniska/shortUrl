@@ -44,7 +44,6 @@ func MustLoad() *Config {
 		log.Fatal("error loading env", err)
 	}
 	configPath := os.Getenv("CONFIG_PATH")
-
 	if configPath == "" {
 		log.Fatal("CONFIG_PATH is not set")
 	}
@@ -58,6 +57,9 @@ func MustLoad() *Config {
 	if err := cleanenv.ReadConfig(configPath, &cfg); err != nil {
 		log.Fatalf("cannot read config: %s", err)
 	}
-
+	host := os.Getenv("SPRING_DATASOURCE_URL")
+	if host != "" {
+		cfg.Postgres.Host = host
+	}
 	return &cfg
 }

@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  postgres:
+    image: postgres
+    container_name: postgres
+    ports:
+      - "5436:5432"
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+  shorturl:
+    image: shorturl
+    container_name: shorturl
+    depends_on:
+      - postgres
+    ports:
+      - "44044:44044"
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=host.docker.internal
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - DB_PASSWORD=postgres
