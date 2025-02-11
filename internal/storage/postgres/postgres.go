@@ -3,6 +3,7 @@ package postgres
 import (
 	"fmt"
 	"os"
+	"time"
 
 	"github.com/dennnniska/shortUrl/internal/config"
 	"github.com/dennnniska/shortUrl/internal/storage"
@@ -22,8 +23,14 @@ func New(cfg *config.Postgres) (storage.Storage, error) {
 		return nil, err
 	}
 	err = db.Ping()
+	if err != nil && err.Error() == "EOF" {
+		time.Sleep(time.Millisecond * 5)
+		err = db.Ping()
+	}
+
 	if err != nil {
-		return nil, err
+
+		return nil, fmt.Errorf("postgres ping: %s", err.Error())
 	}
 
 	stmt, err := db.Prepare(`

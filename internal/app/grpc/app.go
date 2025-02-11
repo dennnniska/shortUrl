@@ -13,10 +13,10 @@ import (
 type App struct {
 	log        *slog.Logger
 	gRPCServer *grpc.Server
-	port       int
+	port       string
 }
 
-func New(log *slog.Logger, port int, service service.ServiceShortUrl) *App {
+func New(log *slog.Logger, port string, service service.ServiceShortUrl) *App {
 	gRPCServer := grpc.NewServer()
 
 	shortUrlGRPC.RegisterGRPCServer(gRPCServer, service, log)
@@ -37,9 +37,9 @@ func (a *App) MustRun() {
 func (a *App) Run() error {
 	const op = "grpcApp.Run"
 
-	log := a.log.With(slog.String("op", op), slog.Int("port", a.port))
+	log := a.log.With(slog.String("op", op), slog.String("port", a.port))
 
-	l, err := net.Listen("tcp", fmt.Sprintf(":%d", a.port))
+	l, err := net.Listen("tcp", fmt.Sprintf(":%s", a.port))
 	if err != nil {
 		return fmt.Errorf("%s: %w", op, err)
 	}

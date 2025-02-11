@@ -18,7 +18,7 @@ type Config struct {
 }
 
 type GRPCConfig struct {
-	Port    int           `yaml:"port"`
+	Port    string        `yaml:"port"`
 	Timeout time.Duration `yaml:"timeout"`
 }
 
@@ -60,6 +60,18 @@ func MustLoad() *Config {
 	host := os.Getenv("SPRING_DATASOURCE_URL")
 	if host != "" {
 		cfg.Postgres.Host = host
+	}
+	portGRPC := os.Getenv("PORT_GRPC")
+	if portGRPC != "" {
+		cfg.GRPC.Port = portGRPC
+	}
+	portHTTP := os.Getenv("PORT_HTTP")
+	if portHTTP != "" {
+		cfg.Http.Address = portHTTP
+	}
+	portPostgres := os.Getenv("PORT_POSTGRES")
+	if portPostgres != "" {
+		cfg.Postgres.Port = portPostgres
 	}
 	return &cfg
 }

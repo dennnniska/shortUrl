@@ -1,7 +1,7 @@
 env: "local"
 in_memory_storage: false
 grpc:
-  port: 44044
+  port: "44044"
   timeout: 5s
 http:
   address: "localhost:8082"
